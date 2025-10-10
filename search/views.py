@@ -2,9 +2,9 @@
 from django.shortcuts import render
 from django.db.models import Q
 from blog.models import Post
-from tags.models import Tag, UserTag
+from tags.models import Tag
 from users.models import User
-from exercise_logs.models import ExerciseLog
+
 
 def search_view(request):
     query = request.GET.get("q", "").strip()
@@ -15,7 +15,7 @@ def search_view(request):
         "tags": [],
         "blog_posts": [],
         "users": [],
-        "exercise_logs": [],
+        "exercise_logs": [],  # 空リストを残してテンプレートエラー回避
     }
 
     if query:
@@ -58,17 +58,10 @@ def search_view(request):
         print("DEBUG users=", results["users"])
 
         # --------------------------
-        # 運動ログ検索（運動名）
+
         # --------------------------
-        exercise_qs = ExerciseLog.objects.filter(
-            exercise__name__icontains=query
-        )
 
-        # タグに紐づく運動ログも追加
-        if tags.exists():
-            exercise_qs = exercise_qs | ExerciseLog.objects.filter(tags__in=tags)
-
-        results["exercise_logs"] = exercise_qs.distinct()
+        results["exercise_logs"] = []  # 空リストで安全に保持
         print("DEBUG exercise_logs=", results["exercise_logs"])
 
     return render(

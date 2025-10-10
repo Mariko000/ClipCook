@@ -6,10 +6,8 @@
 #app {
   background-color: #5A4DA0;            /* 落ち着いたパープル系に変更 */
   position: relative;                   /* ::beforeの基準 */
-  filter: saturate(0.9) brightness(1.05);
-  color: #fff;                          /* 文字色 */
-  font-family: 'M PLUS Rounded 1c', sans-serif;
-
+  /*filter: saturate(0.9) brightness(1.05);*/
+  font-family: 'Comic Neue', 'Yu Gothic', sans-serif;
   min-height: 100vh;
   width: 100%;
 }
@@ -17,57 +15,35 @@
 /* ================================
   #app の背景画像レイヤー
 =============================== */
-#app::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  /*background: url("../images/background.png") center/contain repeat;*/
-  opacity: 0.2;    /* パターン控えめ */
-  z-index: -1;
-}
+
 
 /* ================================
   aタグ hover効果（PC用）
-=============================== */
-@media (hover: hover) {
+  @media (hover: hover) {
   #app a:hover {
-    background-color: hsla(160, 100%, 37%, 0.1); /* 控えめ */
+    background-color: hsla(160, 100%, 37%, 0.1); /* 控えめ 
   }
 }
 
-/* ================================
-  ガチャコンテナ・内部要素
 =============================== */
-.gacha-container {
-  width: 600px;        /* PC基準 */
-  max-width: 95%;      /* 小画面で縮小 */
-  margin: 0 auto;
-  padding: 16px;
+
+/* ブックマークボタン */
+.bookmark-btn {
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
-.capsule {
-  width: 80px;
-  max-width: 15vw;
-  transition: width 0.3s ease;
+.bookmark-btn i {
+  color: #a0a0a0; /* 未ブックマークはグレー */
+  transition: color 0.3s, transform 0.2s ease;
 }
 
-/* ================================
-  ボタン
-=============================== */
-.btn-cta {
-  background-color: #3F51B5; /* 落ち着いたブルー */
-  color: white;
-  font-weight: bold;
-  border-radius: 8px;
-  padding: 8px 16px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-  transition: all 0.3s ease;
+.bookmark-btn i.bookmarked {
+  color: #FFD700; /* ゴールド */
+  transform: scale(1.2); /* アニメーションで少し大きく */
 }
 
-.btn-cta:hover {
-  background-color: #303F9F;
-  transform: translateY(-1px);
-}
 
 /* ================================
   レスポンシブ対応

@@ -49,6 +49,14 @@
               <button class="btn btn-outline-greige" type="submit">search</button>
             </form>                    
           </li>
+            <!-- デバッグ用ログイン状態 -->
+  <li class="nav-item me-3">
+    {% if request.user.is_authenticated %}
+      <span class="text-success">● オンライン</span>
+    {% else %}
+      <span class="text-muted">未ログイン</span>
+    {% endif %}
+  </li>
   
           {% if user.is_authenticated %}
           <li class="nav-item">

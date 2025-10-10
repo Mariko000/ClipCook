@@ -1,42 +1,108 @@
-from django.shortcuts import redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+# comments/views.py
+import json
+from django.http import JsonResponse
 from django.contrib.contenttypes.models import ContentType
-from .forms import CommentForm
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 from .models import Comment
-from blog.models import Post
+from .serializers import CommentSerializer
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
+# コメント作成（既存の add_comment を拡張、返り値に author 情報を含める）
+@require_POST
 @login_required
 def add_comment(request):
-    """
-    ブログ投稿にコメントを追加するビュー。
-    """
-    if request.method == 'POST':
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.author = request.user
-            
-            # content_typeとobject_idを取得
-            content_type_id = request.POST.get('content_type_id')
-            object_id = request.POST.get('object_id')
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+    except Exception as e:
+        return JsonResponse({"error": "Invalid JSON", "detail": str(e)}, status=400)
 
+    object_id = data.get('object_id')
+    content_type_id = data.get('content_type_id')
+    text = data.get('text')
+
+    if not all([object_id, content_type_id, text]):
+        return JsonResponse({"error": "Missing required fields"}, status=400)
+
+    try:
+        content_type = ContentType.objects.get(id=content_type_id)
+    except ContentType.DoesNotExist:
+        return JsonResponse({"error": "Invalid content_type_id"}, status=400)
+
+    try:
+        comment = Comment.objects.create(
+            author=request.user,
+            content_type=content_type,
+            object_id=object_id,
+            text=text
+        )
+        # author の avatar がある場合は絶対 URL を返す
+        avatar_url = None
+        if getattr(comment.author, "avatar", None):
             try:
-                # object_idを使用して、投稿のインスタンスを実際に取得
-                post_instance = get_object_or_404(Post, pk=object_id)
-                content_type = ContentType.objects.get_for_model(post_instance)
-                
-                comment.content_type = content_type
-                comment.object_id = object_id
-                
-                comment.save()  # コメントをデータベースに保存
-                
-                # コメントが保存されたら、元の投稿詳細ページにリダイレクト
-                return redirect(post_instance.get_absolute_url())
+                avatar_url = request.build_absolute_uri(comment.author.avatar.url)
+            except Exception:
+                avatar_url = None
 
-            except (ValueError, ContentType.DoesNotExist):
-                # エラーが発生した場合でも元の投稿ページにリダイレクト
-                return redirect('blog:post_detail', pk=object_id)
-    
-    # POSTメソッド以外、またはフォームが無効な場合は、元の投稿ページにリダイレクト
-    object_id = request.POST.get('object_id')
-    return redirect('blog:post_detail', pk=object_id)
+        response = {
+            "comment": {
+                "id": comment.id,
+                "text": comment.text,
+                "created_at": comment.created_at.isoformat(),
+                "author": {
+                    "id": comment.author.id,
+                    "username": comment.author.username,
+                    "avatar": avatar_url,
+                }
+            }
+        }
+        return JsonResponse(response, status=201)
+    except Exception as e:
+        # サーバログにスタックトレース出す（開発時のみ）
+        import traceback
+        print(traceback.format_exc())
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+# コメント一覧取得（author情報付き）
+@api_view(["GET"])
+def list_comments(request):
+    object_id = request.GET.get("object_id")
+    content_type_id = request.GET.get("content_type_id")
+
+    if not all([object_id, content_type_id]):
+        return Response({"error": "Missing required fields"}, status=400)
+
+    try:
+        content_type = ContentType.objects.get(id=content_type_id)
+    except ContentType.DoesNotExist:
+        return Response({"error": "Invalid content_type_id"}, status=400)
+
+    comments = (
+        Comment.objects
+        .filter(content_type=content_type, object_id=object_id)
+        .select_related("author")
+        .order_by("-created_at")
+    )
+
+    # ✅ ここでシリアライザを呼び出す
+    serializer = CommentSerializer(comments, many=True, context={"request": request})
+
+    # ✅ Responseで返す（JsonResponseよりDRF標準的）
+    return Response({"comments": serializer.data})
+
+# コメント削除（本人のみ）
+@require_POST
+@login_required
+def delete_comment(request, pk):
+    try:
+        comment = Comment.objects.get(pk=pk)
+    except Comment.DoesNotExist:
+        return JsonResponse({"error": "Not found"}, status=404)
+
+    if comment.author != request.user:
+        return JsonResponse({"error": "Forbidden"}, status=403)
+
+    comment.delete()
+    return JsonResponse({"deleted": True})

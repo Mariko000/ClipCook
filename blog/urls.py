@@ -10,8 +10,6 @@ urlpatterns = [
     path('post/<int:pk>/edit/', views.post_edit, name='post_edit'),
     # いいね機能のURL
     path('post/<int:pk>/like/', views.post_like, name='post_like'), 
-    # エクササイズの投稿ができる機能のURLを追加
-    path('exercise-log/', views.exercise_log_list, name='exercise_log_list'),
     # チェックボックスで選択されたものを削除
     path('delete-selected/', views.delete_selected_posts, name='delete_selected_posts'),
     # 全部削除

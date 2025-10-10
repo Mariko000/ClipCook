@@ -22,10 +22,20 @@ class UserListSerializer(serializers.ModelSerializer):
     
     # 共通タグを計算するためのフィールド
     common_tags = serializers.SerializerMethodField()
+
+    avatar_url = serializers.SerializerMethodField()
     
     class Meta:
         model = User
-        fields = ["id", "username", "bio", "avatar", "tags", "followers_count", "following_count", "common_tags"]
+        fields = ["id", "username", "bio", "avatar", 
+                  "tags", "followers_count", "following_count", "common_tags"]
+        
+    def get_avatar_url(self, obj):
+        request = self.context.get('request')
+        if obj.avatar:
+            return request.build_absolute_uri(obj.avatar.url)
+        # ✅ avatarがない場合のデフォルトパス
+        return request.build_absolute_uri('/static/images/default_avatar.svg')
         
     def get_common_tags(self, obj):
         request_user = self.context.get('request_user')
@@ -37,3 +47,29 @@ class UserListSerializer(serializers.ModelSerializer):
         
         common_tag_names = list(request_user_tags.intersection(obj_tags))
         return common_tag_names
+
+class CurrentUserSerializer(serializers.ModelSerializer):
+    """
+    ログイン中のユーザー専用のシリアライザ
+    - avatar は絶対URLで返す
+    - avatar がない場合は None を返す（フロント側でdefaultを処理）
+    """
+    avatar_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "email",
+            "status_level",
+            "points",
+            "avatar_url",
+        ]
+
+    def get_avatar_url(self, obj):
+        request = self.context.get("request")
+        if obj.avatar and hasattr(obj.avatar, "url"):
+            return request.build_absolute_uri(obj.avatar.url)
+        # avatar がない場合は None を返す（Vue 側で代替画像を表示）
+        return None

@@ -1,0 +1,11 @@
+Django==5.1.1
+djangorestframework
+django-cors-headers
+django-allauth
+django-crispy-forms
+crispy-bootstrap5
+imagekit
+webpush
+celery
+redis
+profanity-filter

@@ -21,5 +21,7 @@ urlpatterns = [
     path("list/", views.user_list_page, name="user_list_page"),
 
     path('unlock-next/', unlock_next_view, name='unlock-next'), # ←レベルアップ用
-    path('api/level-up/', level_up_api, name='level-up')
+    path('api/level-up/', level_up_api, name='level-up'),
+    #認証済み専用 API
+    path('api/current-user/', views.current_user_info, name='current_user_info'),
 ]

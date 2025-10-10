@@ -37,7 +37,11 @@ urlpatterns = [
     path('api/users/', include('users.api.urls')),
     path('', core_views.home, name='home'),
     path('blog/', include('blog.urls')),
+   
+    path('api/likes/', include('likes.urls')),      # いいね機能のAPIエンドポイント設置
     path('comments/', include('comments.urls')),
+    path("api/", include("comments.urls")),  # コメント機能のAPIエンドポイント設置
+
     path('contact/', include('contact.urls')),
     path('search/', include('search.urls')),
     path("messengers/", include("messengers.urls")), 
@@ -45,6 +49,14 @@ urlpatterns = [
     
     # フォロー関連のAPIエンドポイントを管理
     path('api/followers/', include('followers.urls')),
+
+    # 食材の単位を変換するアプリの関連のAPIエンドポイントを管理
+    path('api/foodconversion/', include('foodconversion.urls')),
+    # レシピの保存
+    path("api/", include("recipes.urls")),
+
+    # ブックマーク
+    path('api/bookmarks/', include('bookmarks.urls')),
 
 ]
 

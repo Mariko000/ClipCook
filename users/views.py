@@ -15,15 +15,17 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
 from django.db.models import Count
-from .serializers import UserListSerializer
+from .serializers import UserListSerializer, CurrentUserSerializer
 from followers.models import Follow
 from blog.models import Post
 import random
 from followers.models import Follow, Block
 from datetime import date, timedelta
+from rest_framework.response import Response
 
-#
+
 User = get_user_model()
+
 
 @login_required
 def profile_update(request):
@@ -108,6 +110,8 @@ def user_profile(request):
     ログイン中のユーザープロフィールを表示します。
     """
      # ログイン中のユーザーを取得
+    print("DEBUG: request.user =", request.user)
+    print("DEBUG: is_authenticated =", request.user.is_authenticated)
     profile_user = request.user
 
     # フォロワー一覧（自分をフォローしている人）
@@ -130,6 +134,7 @@ def user_profile(request):
         'followers': followers,
         'following': following,
         'tags': tags,
+        'debug_authenticated': request.user.is_authenticated,  # テンプレートでも確認可
     }
     return render(request, 'account/user_profile.html', context)
 
@@ -171,16 +176,11 @@ def user_profile_detail(request, user_id):
 @permission_classes([IsAuthenticated])
 def current_user_info(request):
     """
-    ログイン中のユーザー情報を返すAPIエンドポイント
+    ログイン中のユーザー情報を返すAPI
     """
-    # ユーザーが認証されている場合、その情報をJSONで返す
-    return JsonResponse({
-        'id': request.user.id,
-        'username': request.user.username,
-        'email': request.user.email,
-        'status_level': request.user.status_level,
-        'points': request.user.points
-    })
+    serializer = CurrentUserSerializer(request.user, context={'request': request})
+    return Response(serializer.data)
+
 
 
 # API用のUserListViewをここに追加

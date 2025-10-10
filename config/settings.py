@@ -55,6 +55,10 @@ INSTALLED_APPS = [
     'messengers',
     'profanity_filter',
     'vue_integration', #→vueアプリ用のバックエンド
+    # このアプリに追加
+    'foodconversion',
+    'recipes',
+    'bookmarks',
 
 
 
@@ -213,13 +217,17 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ],
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    # 'PAGE_SIZE': 5,
+
 }
+
 
 # allauthの設定
 SITE_ID = 1
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_LOGIN_METHODS = ['username', 'email']
-ACCOUNT_SIGNUP_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_SIGNUP_EMAIL_VERIFICATION = 'none'
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_FORMS = {
@@ -248,19 +256,21 @@ ACCOUNT_LOGOUT_REDIRECT_URL = 'account_login' # Default: '/'
 # Cookie（認証情報）の送信を許可する
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    # "http://localhost:5173",
-    "http://127.0.0.1:5173",  # 安全のためにこれも追加
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
+
 CSRF_TRUSTED_ORIGINS = [
-    #"http://localhost:5173",
+    "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
 
 # ローカル開発用
-SESSION_COOKIE_SAMESITE = "Lax"  # None→Lax
-CSRF_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
+CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False      # https を使う場合は True
+
 
 # 本番環境（HTTPS）にする場合のみ
 # SESSION_COOKIE_SAMESITE = "Lax"  # None→Lax
@@ -273,7 +283,8 @@ CSRF_COOKIE_SECURE = False      # https を使う場合は True
 #CSRF_COOKIE_SAMESITE = 'Lax'
 
 # セッションクッキーの設定を追加
-SESSION_COOKIE_DOMAIN = None
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 

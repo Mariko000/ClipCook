@@ -6,7 +6,7 @@ from .models import User
 class UserAdmin(BaseUserAdmin):
     # 詳細画面に email, points, status_level を追加
     fieldsets = BaseUserAdmin.fieldsets + (
-        ('プロフィール', {'fields': ('points', 'status_level')}),
+        ('プロフィール', {'fields': ('points', 'status_level', 'bio', 'avatar')}),
     )
 
     # 一覧画面に email, points, status_level を追加

@@ -7,7 +7,6 @@ from likes.models import Like
 from django.contrib.contenttypes.models import ContentType
 from comments.forms import CommentForm
 from tags.models import Tag
-from exercise_logs.models import ExerciseLog
 from django.db.models import Count
 from django.http import JsonResponse
 
@@ -31,6 +30,7 @@ def post_list(request):
         'current_sort': sort,
     })
 
+
 # ========================================
 # 投稿詳細
 # ========================================
@@ -40,48 +40,26 @@ def post_detail(request, pk, slug=None):
         return redirect(post.get_absolute_url())
 
     is_liked = False
-    exercise_logs = []
     if request.user.is_authenticated:
         is_liked = Like.objects.filter(
             user=request.user,
             object_id=post.pk,
             content_type=ContentType.objects.get_for_model(Post)
         ).exists()
-        exercise_logs = ExerciseLog.objects.filter(user=request.user).order_by('-date', '-time')
 
     form = CommentForm()
     return render(request, 'blog/post_detail.html', {
         'post': post,
         'form': form,
         'is_liked': is_liked,
-        'exercise_logs': exercise_logs
     })
 
+
 # ========================================
-# 新規投稿（ガチャ経由の最新運動ログ1件付き）
+# 新規投稿
 # ========================================
 @login_required
 def post_new(request):
-    """
-    新規投稿画面。
-    exercise_logs = [] をデフォルトにし、
-    セッションに gacha_completed がある場合のみ最新の from_gacha=True ログ1件を渡す。
-    """
-    exercise_logs = []
-
-    # 1回だけ取り出す（pop で消す）
-    from_gacha = request.session.pop('gacha_completed', False)
-
-    if from_gacha:
-        latest_gacha_log = (
-            ExerciseLog.objects
-            .filter(user=request.user, from_gacha=True)
-            .order_by('-performed_at')   # あなたのモデルに合わせて performed_at
-            .first()
-        )
-        if latest_gacha_log:
-            exercise_logs = [latest_gacha_log]
-
     if request.method == "POST":
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
@@ -92,13 +70,15 @@ def post_new(request):
                 post = form.save(commit=False)
                 post.author = request.user
                 post.save()
-                # タグ処理は既存のまま（あなたの要求通り変更しない）
+
+                # タグ処理
                 tags_str = form.cleaned_data.get("tags", "")
                 tag_names = [t.strip() for t in tags_str.split(",") if t.strip()]
                 post.tags.clear()
                 for name in tag_names:
                     tag, _ = Tag.objects.get_or_create(name=name)
                     post.tags.add(tag)
+
                 return redirect('blog:post_detail', pk=post.pk, slug=post.slug)
     else:
         form = PostForm()
@@ -106,8 +86,8 @@ def post_new(request):
     return render(request, 'blog/post_form.html', {
         'form': form,
         'page_title': '新しい投稿',
-        'exercise_logs': exercise_logs,
     })
+
 
 # ========================================
 # 投稿編集
@@ -119,8 +99,6 @@ def post_edit(request, pk):
     if post.author != request.user:
         return redirect('blog:post_detail', pk=post.pk, slug=post.slug)
 
-    exercise_logs = ExerciseLog.objects.filter(user=request.user).order_by('-date', '-time')
-
     if request.method == "POST":
         form = PostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
@@ -130,7 +108,7 @@ def post_edit(request, pk):
             else:
                 post = form.save(commit=False)
                 post.author = request.user
-                post.save()  # save() 内で slug 生成済み
+                post.save()
 
                 # タグ処理
                 tags_str = form.cleaned_data.get("tags", "")
@@ -148,8 +126,8 @@ def post_edit(request, pk):
     return render(request, 'blog/post_form.html', {
         'form': form,
         'page_title': '投稿を編集',
-        'exercise_logs': exercise_logs,
     })
+
 
 # ========================================
 # 選択削除
@@ -157,32 +135,22 @@ def post_edit(request, pk):
 @login_required
 def delete_selected_posts(request):
     if request.method == "POST":
-        # Ajaxリクエスト判定
         is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
         selected_ids = request.POST.get('selected_posts', '')
         ids_list = [int(pk) for pk in selected_ids.split(',') if pk.isdigit()]
 
-        # 投稿者が request.user の投稿のみ削除
         posts_to_delete = Post.objects.filter(pk__in=ids_list, author=request.user)
         count = posts_to_delete.count()
         posts_to_delete.delete()
-
-
-        from .models import Post
-        posts_to_delete = Post.objects.filter(pk__in=ids_list, author=request.user)
-        count = posts_to_delete.count()
-        posts_to_delete.delete()
-
 
         if is_ajax:
             return JsonResponse({"error": False, "deleted_count": count})
         else:
-            # 通常のPOSTならリダイレクト
-            from django.shortcuts import redirect
             return redirect('blog:post_list')
 
     return JsonResponse({"error": True, "message": "Invalid request"})
+
 
 # ========================================
 # 全削除
@@ -195,10 +163,10 @@ def delete_all_posts(request):
 
     return JsonResponse({'error': True, 'message': 'Invalid request'}, status=400)
 
+
 # ========================================
 # いいね機能 (Ajax専用)
 # ========================================
-
 @login_required
 def post_like(request, pk):
     if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -225,12 +193,3 @@ def post_like(request, pk):
         })
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
-
-
-# ========================================
-# 運動ログ一覧
-# ========================================
-@login_required
-def exercise_log_list(request):
-    logs = ExerciseLog.objects.filter(user=request.user).order_by('-date', '-time')
-    return render(request, 'blog/exercise_log_list.html', {'logs': logs})
