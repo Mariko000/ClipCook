@@ -185,7 +185,8 @@ jp_to_en = {
     "タマゴ": "egg",
     "玉子": "egg",
     "elbow macaroni": "エルボーマカロニ",
-    "cheddar cheese": "チェダーチーズ (シュレッド)", 
+    "cheddar cheese": "チェダーチーズ (シュレッド)",
+    "ベーキングパウダー": "baking powder", 
 }
 
 # 逆引き辞書を自動生成
