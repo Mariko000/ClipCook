@@ -1,4 +1,5 @@
 <!-- UserProfile.vue -->
+<!-- 使用中止 -->
 <template>
     <img :src="avatarUrl" class="avatar" />
   </template>

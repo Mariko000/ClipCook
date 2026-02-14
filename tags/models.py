@@ -11,7 +11,7 @@ class Tag(models.Model):
         return self.name
     
 
-
+#「ユーザー追加タグ」
 class UserTag(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="tags")
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE, related_name="users")

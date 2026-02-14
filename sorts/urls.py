@@ -1,0 +1,6 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('recipes/', views.sort_recipes, name='sort_recipes'),
+]

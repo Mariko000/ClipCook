@@ -4,48 +4,117 @@
 
 {% block content %}
 
-<section class="hero text-center py-5">
+<section class="hero text-center py-5" style="background-color:#FFFDF7;">
   <div class="container">
-    <!--黒（0, 0, 0）の影を透過度0.5（50%）で表示-->
-    <h1 class="fw-bold display-5 welcome-heading" style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">
-      座りすぎ注意！<br>
-      運動ガチャで遊びながら<br>
-      リフレッシュ！
+
+    <!-- ロゴ（文字ごとの遅延フェード）-->
+    <h1 class="fw-bold display-4 mb-4 hero-logo" style="font-family:'Comic Neue','Yu Gothic',sans-serif; color:#4E8098;">
+      ClipCook
     </h1>
 
-    <!--<a href="{% url 'about_page' %}" class="btn-custom mt-3">
-        <span>about</span>
-      </a>
-    -->
-      
+    <!-- メインコピー（右からスライドして中央に集まる）-->
+    <p class="hero-main mb-3" style="
+      font-family:'Comic Neue','Yu Gothic',sans-serif;
+      font-size:1.75rem;
+      font-weight:600;
+      color:#333333;
+      line-height:1.4;
+      opacity:0;
+      transform: translateX(50px);
+    ">
+      直感で見つけて、すぐ作れる。ClipCookで、あなたの料理時間をもっとスマートに。
+    </p>
+
+    <!-- サブコピー（左からスライドして中央に集まる）-->
+    <p class="hero-sub mb-4" style="
+      font-family:'Comic Neue','Yu Gothic',sans-serif;
+      font-size:1.15rem;
+      font-weight:400;
+      color:#555555;
+      opacity:0;
+      transform: translateX(-50px);
+    ">
+      外国レシピも、日本のキッチンサイズで簡単再現。ClipCook＋Quantifyで自由にアレンジ。
+    </p>
+
+    <!-- CTAボタン -->
+    <a href="{% url 'quantify_page' %}" class="btn btn-lg fw-bold hero-btn" style="
+      background-color:#FF8C61;
+      color:#FFFDF7;
+      border-radius:12px;
+      padding:12px 32px;
+      font-family:'Comic Neue','Yu Gothic',sans-serif;
+      font-weight:600;
+      text-decoration:none;
+      display:inline-block;
+      transition: all 0.3s ease;
+    " onmouseover="this.style.backgroundColor='#FFD966'" onmouseout="this.style.backgroundColor='#FF8C61'">
+      さっそく使ってみる
+    </a>
+
   </div>
 </section>
+
 <style>
-  /* ぼやけながらフェードインするアニメーションの定義 */
-  @keyframes blur-in {
-    0% {
-      opacity: 0;
-      filter: blur(20px);
-      transform: translateY(20px);
-    }
-    100% {
-      opacity: 1;
-      filter: blur(0);
-      transform: translateY(0);
-    }
+  /* ロゴ文字ごとのタイプライター風フェード（少し遅め） */
+  .hero-logo span {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fade-up 0.8s forwards;
   }
 
-  /* アニメーションを適用するクラス */
-  .welcome-heading.animate {
-    animation: blur-in 1.5s ease-in-out forwards;
+  /* メインコピー・サブコピー・ボタンアニメ */
+  .hero-main { animation: slide-in-right 0.8s forwards; animation-delay: 1s; }
+  .hero-sub { animation: slide-in-left 0.8s forwards; animation-delay: 1.4s; }
+  .hero-btn { animation: fade-in 0.8s forwards; animation-delay: 1.8s; }
+
+  @keyframes fade-up {
+    0% { opacity:0; transform:translateY(20px); }
+    100% { opacity:1; transform:translateY(0); }
+  }
+
+  @keyframes slide-in-right {
+    0% { opacity:0; transform:translateX(50px); }
+    100% { opacity:1; transform:translateX(0); }
+  }
+
+  @keyframes slide-in-left {
+    0% { opacity:0; transform:translateX(-50px); }
+    100% { opacity:1; transform:translateX(0); }
+  }
+
+  @keyframes fade-in {
+    0% { opacity:0; }
+    100% { opacity:1; }
+  }
+
+  /* レスポンシブ */
+  @media (max-width:768px){
+    .hero-main { font-size:1.5rem; }
+    .hero-sub { font-size:1rem; }
+    .hero-btn { padding:10px 24px; font-size:0.95rem; }
+  }
+  @media (max-width:480px){
+    .hero-main { font-size:1.3rem; }
+    .hero-sub { font-size:0.9rem; }
+    .hero-btn { padding:8px 20px; font-size:0.85rem; }
   }
 </style>
 
 <script>
-  // ページ読み込み後にアニメーションを適用
-  document.addEventListener("DOMContentLoaded", function() {
-    const welcomeHeading = document.querySelector('.welcome-heading');
-    welcomeHeading.classList.add('animate');
+document.addEventListener("DOMContentLoaded", function() {
+  // ロゴ文字ごとにspan分割
+  const logoText = document.querySelector('.hero-logo');
+  const text = logoText.textContent;
+  logoText.innerHTML = '';
+  text.split('').forEach((char, i) => {
+    const span = document.createElement('span');
+    span.textContent = char;
+    span.style.animationDelay = `${i*0.08}s`; // 遅めに調整
+    logoText.appendChild(span);
   });
+});
 </script>
+
 {% endblock %}

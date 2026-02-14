@@ -9,7 +9,7 @@
   
       <!-- 小画面用：中央タイトル（collapseの外に置く） -->
       <a class="navbar-brand d-lg-none mx-auto position-absolute start-50 translate-middle-x" 
-         href="{% url 'home' %}">FitSpin</a>
+         href="{% url 'home' %}">ClipCook</a>
   
       <!-- collapse 内：PC/タブレット用タイトルとメニュー -->
       <div class="collapse navbar-collapse" id="navbarNav">
@@ -18,45 +18,27 @@
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <!-- PC・タブレット用タイトル -->
           <li class="nav-item d-none d-lg-block">
-            <a class="navbar-brand" href="{% url 'home' %}">FitSpin</a>
+            <a class="navbar-brand" href="{% url 'home' %}">ClipCook</a>
           </li>
   
           <!-- About + Design & Theme ドロップダウン -->
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="aboutDropdown" role="button" 
-               data-bs-toggle="dropdown" aria-expanded="false">
-              About
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="aboutDropdown">
+            <!--<ul class="dropdown-menu" aria-labelledby="aboutDropdown">
               <li><a class="dropdown-item" href="{% url 'about_page' %}">About</a></li>
               <li><a class="dropdown-item" href="{% url 'explained_design' %}">Design & Theme</a></li>
               <li><a class="dropdown-item" href="{% url 'my_skills' %}">My Skills</a></li>
             </ul>
-          </li>
+          </li>-->
   
-          <li class="nav-item"><a class="nav-link" href="{% url 'blog:post_list' %}">Post</a></li>
-          <li class="nav-item"><a class="nav-link" href="http://127.0.0.1:5173/">ガチャアプリを開く</a></li>
+          <!--<li class="nav-item"><a class="nav-link" href="{% url 'blog:post_list' %}">Post</a></li>-->
+          <!--開発サーバー-->
+          <!--<li class="nav-item"><a class="nav-link" href="http://127.0.0.1:5173/">Quantify</a></li>-->
+          <li class="nav-item"><a class="nav-link" href="{% url 'quantify_page' %}">Quantify</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'users:user_list_page' %}">Find Friends</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'contact:contact' %}">Contact Us</a></li>
         </ul>
   
         <!-- 右側：検索フォーム + ユーザーメニュー -->
         <ul class="navbar-nav ms-auto align-items-center">
-          <!-- 検索フォーム -->
-          <li class="nav-item">
-            <form class="d-flex" action="{% url 'search:search_view' %}" method="GET">
-              <input class="form-control me-2 custom-search-input" type="search" placeholder="search" aria-label="Search" name="q">
-              <button class="btn btn-outline-greige" type="submit">search</button>
-            </form>                    
-          </li>
-            <!-- デバッグ用ログイン状態 -->
-  <li class="nav-item me-3">
-    {% if request.user.is_authenticated %}
-      <span class="text-success">● オンライン</span>
-    {% else %}
-      <span class="text-muted">未ログイン</span>
-    {% endif %}
-  </li>
   
           {% if user.is_authenticated %}
           <li class="nav-item">

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div id="app"></div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Vue SPA エントリーポイント（固定ファイル名） -->
+<script type="module" src="{% static 'vue/assets/index.js' %}"></script>
+<link rel="stylesheet" href="{% static 'vue/assets/index.css' %}">
+
+<!-- Service Worker 登録 -->
+<script src="{% static 'vue/registerSW.js' %}"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register("{% static 'vue/sw.js' %}")
+    .then(() => console.log("✅ Service Worker registered"))
+    .catch(err => console.error("❌ Service Worker registration failed:", err));
+}
+</script>
+{% endblock %}

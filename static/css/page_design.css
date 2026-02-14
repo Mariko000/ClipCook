@@ -1,133 +1,181 @@
 /* ================================
   BODY 全体背景（Djangoテンプレート対応）
 =============================== */
+/* ================================
+  🎨 カラーパレット変数
+=============================== */
+:root {
+  --main-color: #FFD966;       /* バターイエロー */
+  --accent-color: #FF8C61;     /* サーモンオレンジ */
+  --secondary-color: #4E8098;  /* スモーキーブルー */
+  --base-color: #FFFDF7;       /* オフホワイト */
+  --text-color: #333333;       /* チャコールグレー */
+  --border-color: #E0E0E0;     /* ライトグレー */
+}
+
+/* ================================
+  🧱 全体構造・共通設定
+=============================== */
 body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  font-family: 'Comic Neue', 'Yu Gothic', sans-serif;
+  background-color: var(--base-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  padding:20px;
 }
 
-body.d-flex {
-  background-color: #3A7CD5; /* 元ブルーより濃く落ち着かせた色 */
-  position: relative;
-  filter: saturate(0.9) brightness(1.05);
-  color: #fff;
-  font-family: 'M PLUS Rounded 1c';
-}
-
-main { flex: 1 0 auto; }
-
-body.d-flex::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  /* background: url("../images/background.png") center/contain repeat;*/
-  opacity: 0.2; /* パターンは控えめに */
-  z-index: -1;
+main {
+  flex: 1 0 auto;
+  /* padding: 2rem;*/
 }
 
 /* ================================
-  ヘッダー/フッター
+  🪶 ヘッダー・フッター
 =============================== */
 .site-header,
 .site-footer {
-  background-color: #357a38; /* 蛍光グリーンを落ち着いたトーンに変更 */
+  background-color: #FFFDF7; /* ベースカラー：柔らかいオフホワイト */
+  color: #333333;
   z-index: 1000;
+  box-shadow: none; /* 立体感削除 */
+  border: none; /* 枠線削除 */
 }
 
+
 /* ================================
-  ブランドタイトル
+  ✨ ブランドタイトル
 =============================== */
 .navbar-brand {
   font-family: 'Arial Rounded MT Bold', 'Helvetica Rounded', sans-serif;
   font-weight: bold;
   font-size: 2rem;
-  color: white;
-
+  color: #333333;
+  letter-spacing: 0.5px;
+  text-decoration: none;
 }
 
+
 /* ================================
-  ナビリンク
+  🔗 ナビゲーションリンク
 =============================== */
 .nav-link {
-  color: white;
-  font-weight: bold;
+  color: var(--text-color);
+  font-weight: 600;
+  transition: color 0.3s ease;
 }
 
 .nav-link:hover {
-  color: #FFC107; /* アクセントは控えめ黄色 */
+  color: var(--accent-color);
 }
 
 /* ================================
-  ドロップダウン
+  📂 ドロップダウンメニュー
 =============================== */
 .dropdown-menu {
+  background-color: #FFFDF7;
+  border: 1px solid #E0E0E0;
   border-radius: 8px;
-  border: 1px solid #FFC107;
+  box-shadow: none; /* ドロップ影もなしでフラット */
+}
+
+.dropdown-item {
+  color: #333333;
 }
 
 .dropdown-item:hover {
-  background-color: #FFC107;
-  color: #1A1A1A;
+  background-color: #FFD966; /* 優しいバターイエローで選択感 */
+  color: #333333;
 }
-
 /* ================================
-  CTAボタン
+  🧡 ボタン（共通）
 =============================== */
-.btn-cta {
-  background-color: #1976D2; /* 落ち着いたブルー */
-  color: white;
-  font-weight: bold;
-  border-radius: 8px;
-  padding: 8px 16px;
+.btn,
+button {
+
+  border-radius: 10px;
+  font-weight: 600;
   transition: all 0.3s ease;
 }
 
-.btn-cta:hover {
-  background-color: #155fa0;
-  transform: translateY(-1px);
+/* CTAボタン */
+.btn-cta {
+  background-color: var(--accent-color);
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
 }
 
+.btn-cta:hover {
+  background-color: #e7764f;
+  transform: translateY(-2px);
+}
+
+/* アウトラインボタン */
+.btn-outline {
+  border: 2px solid var(--accent-color);
+  color: var(--accent-color);
+  background-color: transparent;
+}
+
+.btn-outline:hover {
+  background-color: var(--accent-color);
+  color: #fff;
+}
+
+/* ================================
+  🔍 検索バー
+=============================== */
 /* ================================
   検索バー
 =============================== */
 .custom-search-input {
   width: 250px;
   border-radius: 8px;
-  border: 1px solid #FFC107;
+  border: 1px solid #4E8098; /* サブカラー2に統一 */
   padding: 6px 10px;
+  background-color: #FFFDF7;
+  color: #333333;
+  transition: all 0.3s ease;
 }
 
+.custom-search-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(78, 128, 152, 0.2);
+}
+
+/* --- Search ボタン --- */
 .btn-outline-greige {
-  border: 1px solid #FFC107;
+  border: 2px solid #4E8098; /* サブカラー2：スモーキーブルー */
   background-color: transparent;
-  color: #444444;
+  color: #4E8098;
   border-radius: 8px;
+  font-weight: 600;
+  padding: 6px 14px;
   transition: all 0.3s ease;
 }
 
 .btn-outline-greige:hover {
-  background-color: #FFC107;
-  color: #1A1A1A;
+  background-color: #4E8098; /* ホバー時は塗りつぶし */
+  color: #FFFDF7;            /* 文字を白に */
+  transform: translateY(-1px);
 }
 
-/* text-muted の上書き */
-.text-muted { color: #fff !important; }
 
 /* ================================
-  ガチャ本体
+  🖼️ セクションタイトル
 =============================== */
-.gacha-container {
-  width: 600px;
-  max-width: 95%;
-  margin: 0 auto;
-  padding: 16px;
+.section-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-color);
+  border-left: 6px solid var(--accent-color);
+  padding-left: 12px;
+  margin-bottom: 1rem;
 }
 
-.capsule {
-  width: 80px;
-  max-width: 15vw;
-}
 
 /* ================================
   レスポンシブ調整

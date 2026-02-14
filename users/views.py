@@ -283,6 +283,7 @@ def user_list_page(request):
     return render(request, 'account/userlist.html', context)
 
 
+# 使っていないが今後の拡張次第で使うかも
 @login_required
 def unlock_next_view(request):
     # ただテンプレートを返す
@@ -290,6 +291,7 @@ def unlock_next_view(request):
     return render(request, 'account/unlock_next.html', {'user': request.user})
 
 
+# 使っていない    
  # ポイント消費でレベルアップできるようにする 
 def level_up_by_points(user, points_to_use=15):
     current_level = getattr(user, 'status_level', 1)
@@ -306,7 +308,7 @@ def level_up_by_points(user, points_to_use=15):
     else:
         return False
 
-    
+# 使っていない    
 @csrf_exempt  # CSRF トークンを利用する場合は不要
 @require_POST
 @login_required
@@ -331,7 +333,7 @@ def level_up_api(request):
     return JsonResponse(response_data)
 
 
-    
+ # 使っていない  
 # 共通：レベルアップ判定用関数
 def check_level_up(user):
     """

@@ -1,11 +1,23 @@
+# core/views.py
 from django.shortcuts import render
 from django.db.models import Q
 from blog.models import Post  # blogアプリのPostモデルをインポート
 from users.models import User # Userモデルをインポート
 from blog.models import Tag  # Tagモデルをインポート
+from django.views.generic import TemplateView
 
 
 # Create your views here.
+
+# Vue SPA 用
+class QuantifyView(TemplateView):
+    template_name = "vue_app.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # base.html でヘッダー非表示フラグ
+        context['vue_page'] = True
+        return context
 
 def search(request):
     """

@@ -1,54 +1,84 @@
 <template>
-  <nav class="custom-navbar">
-    <div class="custom-container">
-      <!-- 左側：ロゴとナビリンク -->
-      <div class="left-section">
-        <a class="custom-brand" href="http://127.0.0.1:8000/">FitSpin</a>
-        <ul class="custom-nav-list">
-          <li class="custom-nav-item">
-            <router-link class="custom-nav-link" to="/" active-class="active">カスタマイザー</router-link>
+  <nav class="navbar navbar-expand-lg" style="background-color: #FFFDF7; position: relative;">
+    <div class="container-fluid">
+
+      <!-- トグルボタン（常に左） -->
+      <button class="navbar-toggler" type="button" @click="collapsed = !collapsed">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- 小画面中央ロゴ -->
+      <a class="navbar-brand mx-auto d-lg-none position-absolute start-50 translate-middle-x"
+         href="http://127.0.0.1:8000/">ClipCook</a>
+
+      <!-- collapse 内 -->
+      <div :class="['collapse navbar-collapse', collapsed ? 'show' : '']">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <!-- PC・タブレット用ロゴ -->
+          <li class="nav-item d-none d-lg-block">
+            <a class="navbar-brand" href="http://127.0.0.1:8000/">ClipCook</a>
           </li>
-          <li class="custom-nav-item">
-            <router-link class="custom-nav-link" to="/add-recipe" active-class="active">レシピ投稿</router-link>
+
+          <!-- ナビリンク -->
+          <li class="nav-item">
+            <router-link class="nav-link" to="/" active-class="active">Quantify</router-link>
           </li>
-          <li class="custom-nav-item">
-            <router-link class="custom-nav-link" to="/timeline" active-class="active">タイムライン</router-link>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/add-recipe" active-class="active">Post Recipe</router-link>
           </li>
-          <li class="custom-nav-item">
-            <router-link class="custom-nav-link" to="/bookmarks" active-class="active">ブックマーク</router-link>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/timeline" active-class="active">Timeline</router-link>
           </li>
-          <li class="custom-nav-item">
-            <router-link to="/my-album">マイレシピアルバム</router-link>
-        </li>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/bookmarks" active-class="active">Bookmarks</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/my-album">My Recipe Album</router-link>
+          </li>
         </ul>
-      </div>
 
-      <!-- 右側：ユーザー情報 -->
-      <div v-if="currentUser" class="user-info">
-        <a v-if="currentUser"
-        :href="'http://127.0.0.1:8000/users/profile/'" class="user-info">
-        <img
-          v-if="currentUser.avatar_url"
-          :src="currentUser.avatar_url"
-          alt="User Avatar"
-          class="user-avatar"
-        />
-        <span class="username">{{ currentUser.username }}</span>
-      </a>
-      </div>
+        <!-- 右端ユーザー情報 -->
+  <div class="search-and-user">
+  <form class="custom-search-form" @submit.prevent="handleSearch">
+    <input
+      v-model="query"
+      class="form-control custom-search-input"
+      type="search"
+      placeholder="Search recipes or tags..."
+    />
+    <button class="btn btn-outline-secondary" type="submit">Search</button>
+  </form>
 
-      <!-- 未ログイン時 -->
-      <div v-else class="user-info">
-        <router-link to="/login" class="custom-nav-link">ログイン</router-link>
+        <div v-if="currentUser">
+          <a :href="'http://127.0.0.1:8000/users/profile/'" class="text-decoration-none">
+            <img v-if="currentUser.avatar_url" :src="currentUser.avatar_url" class="user-avatar" />
+            <span class="username">{{ currentUser.username }}</span>
+          </a>
+        </div>
+        <div v-else>
+          <router-link to="/login" class="nav-link">ログイン</router-link>
+        </div>
       </div>
+    </div>
+
     </div>
   </nav>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()               // routerインスタンスを取得
+
+const collapsed = ref(false)
 const currentUser = ref(null)
+
+const query = ref("")
+function handleSearch() {
+  router.push(`/search?q=${encodeURIComponent(query.value)}`)
+}
+
 
 onMounted(async () => {
   try {
@@ -57,131 +87,98 @@ onMounted(async () => {
     })
     if (!res.ok) throw new Error('APIエラー')
     currentUser.value = await res.json()
-    console.log('ログイン中ユーザー:', currentUser.value)
   } catch (err) {
-    console.error('ユーザー情報取得に失敗:', err)
+    console.error(err)
   }
 })
 </script>
 
 <style scoped>
-.custom-navbar {
-  background-color: #5A4DA0;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  position: relative;
-  z-index: 1000;
-}
 
-.custom-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  height: 70px;
-  padding: 0 20px;
-}
-
-.left-section {
-  display: flex;
-  align-items: center;
-}
-
-/* ロゴ */
-.custom-brand {
-  font-family: 'Arial Rounded MT Bold','Helvetica Rounded',sans-serif;
+.navbar-brand {
+  font-family: 'Arial Rounded MT Bold', 'Helvetica Rounded', sans-serif;
   font-weight: bold;
-  font-size: 1.6rem;
-  color: #fff;
+  font-size: 2rem;
+  color: #333333;
+  letter-spacing: 0.5px;
   text-decoration: none;
-  margin-right: 30px;
 }
 
-/* ナビリンク */
-.custom-nav-list {
-  display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  gap: 15px;
-}
+/* ================================
+  ナビゲーションリンク
+=============================== */
 
-.custom-nav-link {
-  color: #fff;
+.nav-link {
+  font-family: 'Quicksand', sans-serif;
   font-weight: bold;
-  text-decoration: none;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-  transition: color 0.3s, text-shadow 0.3s;
-}
-
-.custom-nav-link:hover {
-  color: #FFD93D;
-  text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
-}
-
-/* ユーザー情報右端 */
-.user-info {
-  display: flex;
-  align-items: center;
-  font-size: 0.9rem;
-  color: #fff;
-  white-space: nowrap;
-  text-decoration: none; /* ← 下線を消す */
-}
-
-/* a 内の span も下線が付く場合は明示的に消す */
-.user-info .username {
-  text-decoration: none;
 }
 
 .user-avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
+  margin-right: 8px;
   object-fit: cover;
-  margin-right: 10px;
 }
 
-/* ================================
-  レスポンシブ対応
-=============================== */
+.username {
+  color: #333333;
+  font-weight: bold;
+  text-decoration: none;
+}
 
-@media (max-width: 768px) {
-  .custom-container {
-    height: auto;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-  .custom-brand {
-    font-size: 1.4rem;
-    margin-right: 0;
-  }
-  .custom-nav-list {
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .user-info {
-    font-size: 0.85rem;
+/* フォーム全体を左寄せ（ロゴ側に近づける） */
+.custom-search-form {
+  margin-left: 0;  /* 必要に応じて px で微調整 */
+}
+
+/* 入力欄の右側マージン */
+.custom-search-input {
+  margin-right: 8px; /* ボタンとの間隔 */
+}
+
+/* 検索ボタンとユーザーアバターの間に余白 */
+.search-and-user {
+  display: flex;
+  align-items: center;
+  gap: 24px; /* ボタンとアバターの間隔を広めに設定 */
+}
+
+/* アバターと名前の間の余白 */
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+
+/* 小画面のとき中央タイトルを固定 */
+@media (max-width: 991.98px) {
+  .navbar .navbar-brand.mx-auto {
+    top: 0.5rem; /* 高さを調整 */
   }
 }
 
-@media (max-width: 480px) {
-  .custom-container {
-    padding: 0 12px;
+/* タブレット以下の画面サイズでは縦並びにする */
+@media (max-width: 991.98px) {
+  .search-and-user {
+    flex-direction: column;  /* 縦並び */
+    align-items: flex-start; /* 左寄せ、中央寄せしたければ center */
+    gap: 8px;                /* 上下の間隔 */
   }
-  .custom-brand {
-    font-size: 1.2rem;
+
+  .custom-search-form {
+    width: 100%;             /* 検索バーを横幅いっぱいに */
   }
-  .custom-nav-list {
-    flex-direction: column;
-    width: 100%;
-    gap: 6px;
-  }
-  .custom-nav-link {
-    font-size: 0.9rem;
-  }
-  .user-info {
-    font-size: 0.8rem;
+
+  /* ユーザー情報を横並びにしたい場合のみ */
+  .search-and-user > div {
+    display: flex;
+    align-items: center;
+    width: 100%;             /* 必要に応じて横幅いっぱい */
+    justify-content: flex-start; /* 左寄せ */
   }
 }
+
 </style>

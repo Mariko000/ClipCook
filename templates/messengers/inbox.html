@@ -14,29 +14,31 @@
   暴力的な発言や、他者を不快にさせるような言葉の使用は控えてください。
 </div>
 
-<div class="d-flex justify-content-center">  <ul class="list-group list-group-flush" style="width: 80%;">  {% for u in users %}
-            <li class="list-group-item d-flex align-items-center mb-3"> 
-              {% if u.avatar %}
-                    <img src="{{ u.avatar.url }}" alt="アバター画像"
-                         class="rounded-circle me-2"
-                         style="width: 64px; height: 64px; object-fit: cover;">
-                {% else %}
-                    <img src="{% static 'images/default_avatar.png' %}"
-                         alt="デフォルトアバター"
-                         class="rounded-circle me-2"
-                         style="width: 64px; height: 64px; object-fit: cover;">
-                {% endif %}
-
-                <a href="{% url 'messengers:conversation' u.id %}">{{ u.username }}</a>
-                {% if u.unread_count and u.unread_count > 0 %}
-                    <span class="badge bg-danger rounded-pill ms-auto">{{ u.unread_count }}</span>
-                {% endif %}
-            </li>
-        {% empty %}
-            <li class="list-group-item text-muted">フォロー中のユーザーがいません</li>
-        {% endfor %}
-    </ul>
+<div class="d-flex justify-content-center">
+  <ul class="list-group list-group-flush" style="width: 80%;">
+      {% for u in users %}
+          <li class="list-group-item d-flex align-items-center mb-3">
+              {% if u.avatar and u.avatar.url %}
+                  <img src="{{ u.avatar.url }}" alt="アバター画像"
+                       class="rounded-circle me-2"
+                       style="width: 64px; height: 64px; object-fit: cover;">
+              {% else %}
+                  <img src="{% static 'images/default_avatar.svg' %}" alt="デフォルトアバター"
+                       class="rounded-circle me-2"
+                       style="width: 64px; height: 64px; object-fit: cover;">
+              {% endif %}
+          
+              <a href="{% url 'messengers:conversation' u.id %}">{{ u.username }}</a>
+              {% if u.unread_count and u.unread_count > 0 %}
+                  <span class="badge bg-danger rounded-pill ms-auto">{{ u.unread_count }}</span>
+              {% endif %}
+          </li>
+      {% empty %}
+          <li class="list-group-item text-muted">フォロー中のユーザーがいません</li>
+      {% endfor %}
+  </ul>
 </div>
+
 <!--※ views.py の inbox で users に未読件数をアノテーションして渡す-->
 <style>
   .list-group-item {

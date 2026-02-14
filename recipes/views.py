@@ -1,13 +1,27 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import PermissionDenied
 
-# ★修正: BasePermission, SAFE_METHODS, IsAuthenticatedをインポートに追加
+# BasePermission, SAFE_METHODS, IsAuthenticatedをインポートに追加
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, BasePermission, SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions
 from .models import Recipe
 from .serializers import RecipeSerializer
 from django.contrib.auth import get_user_model
+import json
+from tags.models import Tag
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def my_recipes(request):
+    """
+    ログインユーザー本人のレシピのみ返す
+    """
+    user = request.user
+    recipes = Recipe.objects.filter(user=user).order_by("-created_at")
+    serializer = RecipeSerializer(recipes, many=True, context={"request": request})
+    return Response(serializer.data)
+
 
 # =================================================================
 # 1. カスタムパーミッション: オーナーシップチェック
@@ -31,40 +45,50 @@ class IsOwnerOrReadOnly(BasePermission):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all().order_by("-created_at")
     serializer_class = RecipeSerializer
-    
-    # ★修正: permission_classesの静的な定義を削除し、get_permissionsで動的に設定する
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly] # ← この行は削除（またはコメントアウト）
 
-    # ★追加: get_permissions メソッド
     def get_permissions(self):
-        """
-        リクエストのメソッドとアクションに基づいてパーミッションを動的に設定する。
-        """
-        # 更新 ('update'/'partial_update') および削除 ('destroy') の場合
+        from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+        from .views import IsOwnerOrReadOnly
+
         if self.action in ['update', 'partial_update', 'destroy']:
-            # ログイン済み (IsAuthenticated) かつ オーナーであること (IsOwnerOrReadOnly) を要求
             self.permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
-        
-        # 新規作成 ('create') の場合
         elif self.action == 'create':
-            # ログインユーザーのみ許可
             self.permission_classes = [IsAuthenticated]
-        
-        # リスト取得 ('list') や詳細閲覧 ('retrieve') の場合 (デフォルト)
         else:
-            # 認証済みでなくても読み取り専用で許可
             self.permission_classes = [IsAuthenticatedOrReadOnly]
-            
         return [permission() for permission in self.permission_classes]
 
     def perform_create(self, serializer):
-       if self.request.user.is_authenticated:
-        serializer.save(user=self.request.user)
-       else:
-        raise PermissionDenied("ログインユーザーのみレシピを作成できます。")
+        recipe = serializer.save(user=self.request.user)
 
+    # ---- 修正版 ----
+        raw_tag_ids = self.request.data.get("tag_ids", "[]")
+        try:
+            tag_ids = json.loads(raw_tag_ids) if isinstance(raw_tag_ids, str) else raw_tag_ids
+        except json.JSONDecodeError:
+            tag_ids = []
 
+        raw_new_tags = self.request.data.get("new_tags", "[]")
+        try:
+             new_tag_names = json.loads(raw_new_tags) if isinstance(raw_new_tags, str) else raw_new_tags
+        except json.JSONDecodeError:
+             new_tag_names = []
 
+        tags_to_set = []
+
+    # 既存タグを追加
+        if tag_ids:
+            tags_to_set.extend(Tag.objects.filter(id__in=tag_ids))
+
+    # 新規タグを作成
+        for name in new_tag_names:
+           if name.strip():
+            tag, created = Tag.objects.get_or_create(name=name.strip())
+            tags_to_set.append(tag)
+
+    # ManyToMany を set() で紐付け
+        if tags_to_set:
+            recipe.tags.set(tags_to_set)
 
 # 既存の recipe_list 関数 (通常はViewSetが代用するため不要だが残す)
 @api_view(["GET"])

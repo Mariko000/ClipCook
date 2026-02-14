@@ -25,8 +25,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-i*7^h2-ed)13xq1+6jmke%tr#q58=_fqfny0of1rf!9qm0_l)l'
 
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -59,6 +57,8 @@ INSTALLED_APPS = [
     'foodconversion',
     'recipes',
     'bookmarks',
+    'recommendation',
+    'sorts',
 
 
 
@@ -80,16 +80,16 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    # CorsMiddlewareはDjangoにCORSのルールを適用させるために必須
+# CorsMiddlewareはDjangoにCORSのルールを適用させるために必須
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    # 'allauth.account.middleware.AccountMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware'
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -171,7 +171,7 @@ USE_TZ = True
 # セキュリティ対策のため、本番環境では必ずFalseに設定してください
 DEBUG = True
 
-ALLOWED_HOSTS = ['your-domain.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['your-domain.com', 'localhost', '127.0.0.1', '192.168.0.5']
 # 'your-domain.com'を個人で使用するドメインに置き換えてください
 
 
@@ -182,12 +182,12 @@ ALLOWED_HOSTS = ['your-domain.com', 'localhost', '127.0.0.1']
 STATIC_URL = '/static/'
 # 開発環境で静的ファイルを格納する場所
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-    BASE_DIR / "apps" / "static",
-    #BASE_DIR / "vue-contents" / "dist",
+    BASE_DIR / "static",               # 今までの静的ファイル
+    BASE_DIR / "vue-contents" / "dist"  # Vue ビルド成果物
 ]
+
 # 本番環境で静的ファイルが収集される場所
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+#STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # メディアファイルの設定
 MEDIA_URL = '/media/'
@@ -255,32 +255,41 @@ ACCOUNT_LOGOUT_REDIRECT_URL = 'account_login' # Default: '/'
 
 # Cookie（認証情報）の送信を許可する
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:8000",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
+    "http://127.0.0.1:8000",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
 
+#CSRF_COOKIE_HTTPONLY = False
+#CSRF_COOKIE_SAMESITE = "Lax"
+#SESSION_COOKIE_SAMESITE = "Lax"
+#CSRF_COOKIE_SECURE = False
+#SESSION_COOKIE_SECURE = False
+
 # ローカル開発用
-CSRF_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_SAMESITE = "None"
-CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = False
+#CSRF_COOKIE_SAMESITE = "None"
+#SESSION_COOKIE_SAMESITE = "None"
+#CSRF_COOKIE_SECURE = False
+#SESSION_COOKIE_SECURE = False
 
 
 # 本番環境（HTTPS）にする場合のみ
-# SESSION_COOKIE_SAMESITE = "Lax"  # None→Lax
-# CSRF_COOKIE_SAMESITE = "Lax"
-# SESSION_COOKIE_SECURE = False
-# CSRF_COOKIE_SECURE = False      # https を使う場合は True
+SESSION_COOKIE_SAMESITE = "Lax"  # None→Lax
+CSRF_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False      # https を使う場合は True
 
 # セッションおよびCSRFクッキー設定
-#SESSION_COOKIE_SAMESITE = 'Lax'
-#CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
 
 # セッションクッキーの設定を追加
 SESSION_COOKIE_SAMESITE = 'Lax'

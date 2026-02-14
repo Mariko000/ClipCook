@@ -3,6 +3,7 @@ import RecipeInput from '../components/RecipeInput.vue'
 import '@fortawesome/fontawesome-free/css/all.min.css'
 
 
+
 // レシピを保存
 import RecipeForm from '../components/RecipeForm.vue'
 //投稿
@@ -15,6 +16,10 @@ import BookmarkList from '../components/BookmarkList.vue'
 import RecipeDetail from '../components/RecipeDetail.vue' 
 // マイアルバム
 import UserAlbum from '../components/Album.vue'
+
+import SearchResults from '../components/SearchResults.vue'
+
+import Reference from '../components/ConversionReference.vue'
 
 const routes = [
   {
@@ -52,10 +57,13 @@ const routes = [
     name: "UserAlbum",
     component: UserAlbum,
   },
+  { path: '/search', component: SearchResults },
+  { path: '/reference', component: Reference },
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  // ベースを /quantify/ にする
+  history: createWebHistory('/quantify/'),
   routes
 })
 
