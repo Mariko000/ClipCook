@@ -10,7 +10,7 @@ ClipCookは、海外レシピ特有の単位（cup, oz, lb等）や、地域に�
 ### **1. Quantify（レシピ・カスタマイザー）**
 * **単位変換機能**: 日英米レシピの双方向変換（外国単位 ↔ 日本単位）。
 * **材料連動型・自動倍率計算**: 1つの材料を変えると、レシピ全体の分量を自動調整（例: 1人前 ↔ 4人前）。
-* <!-- Uploading "Screen Recording 2026-02-14 at 2.13.42 PM.mov"... -->
+[* <!-- Uploading "Screen Recording 2026-02-14 at 2.13.42 PM.mov"... -->](https://github.com/user-attachments/assets/6ab1ec1e-1d95-4a50-a1d3-abcc5b35ba76)
 
 ### **2. Timeline（TikTok風SNS）**
 * **スワイプUI**: 写真付きレシピを直感的にブラウズ。
